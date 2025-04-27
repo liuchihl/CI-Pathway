@@ -27,23 +27,20 @@ class LinearNN(nn.Module):
         self.fc2 = nn.Linear(128, 64)        # Second hidden layer
         self.fc3 = nn.Linear(64, num_classes)  # Output layer
         self.relu = nn.ReLU()  # Activation function
-        
+        self.dropout = nn.Dropout(0.5)  # Dropout layer to prevent overfitting
     def forward(self, x):
         # Flatten the input
         x = x.view(x.size(0), -1)
-        
-        # Pass through the layers with activation
         x = self.relu(self.fc1(x))
+        x = self.dropout(x)
         x = self.relu(self.fc2(x))
+        x = self.dropout(x)
         x = self.fc3(x)
-        
         return x
 model = LinearNN()
 
 
 transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomCrop(32, padding=4),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
@@ -162,6 +159,6 @@ plt.tight_layout()
 plt.show()
 
 # Save the model
-torch.save(model.state_dict(), 'cifar10_model.pth')
+torch.save(model.state_dict(), 'cifar10_model_dropout.pth')
 # save the figures
-plt.savefig('train_val_loss_augmentation.png')
+plt.savefig('train_val_loss_dropout.png')
