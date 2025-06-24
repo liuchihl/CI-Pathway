@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name="pytorch_job"
-#SBATCH --output="pytorch_job.%j.out"
-#SBATCH --error="pytorch_job.%j.err"
+#SBATCH --job-name="pytorch_multi_GPU_job"
+#SBATCH --output="pytorch_job_multiGPU.%j.out"
+#SBATCH --error="pytorch_job_multiGPU.%j.err"
 #SBATCH --partition=ghx4
 #SBATCH -t 03:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1 # could be 1 for py-torch
-#SBATCH --gpus-per-node=1
+#SBATCH --ntasks-per-node=2 
+#SBATCH --gpus-per-node=2
 #SBATCH --gpu-bind=closest   # select a cpu close to gpu on pci bus topology
 #SBATCH --cpus-per-task=4   # spread out to use 1 core per numa, set to 64 if tasks is 1
 #SBATCH --mem=16G
@@ -17,7 +17,11 @@
 
 # Load the PyTorch module
 module load python/miniforge3_pytorch/2.7.0
+# Install required packages
+pip install wandb accelerate
+
+export WANDB_API_KEY="d39326be2eced0eedbe06a26bd062349b3d12cf3"
 date
-# Run your script
-python session1.py
+# Run script
+accelerate launch --num_processes=2 --num_machines=1 session3_notebook_multiGPU.py
 date
